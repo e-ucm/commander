@@ -66,20 +66,20 @@ public class Commands {
 
 	/**
 	 * Undoes the last command
+	 * 
+	 * @return if a command was undone
 	 */
-	public void undo() {
-		if (currentStack != null) {
-			currentStack.undo();
-		}
+	public boolean undo() {
+		return currentStack != null && currentStack.undo();
 	}
 
 	/**
 	 * Executes the last undone command, if any
+	 * 
+	 * @return if a command was redone
 	 */
-	public void redo() {
-		if (currentStack != null) {
-			currentStack.redo();
-		}
+	public boolean redo() {
+		return currentStack != null && currentStack.redo();
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class Commands {
 		/**
 		 * Undo last command, if any
 		 */
-		public void undo() {
+		public boolean undo() {
 			if (!undoHistory.isEmpty()) {
 				Command command;
 				do {
@@ -231,13 +231,15 @@ public class Commands {
 					model.notify(command.undoCommand());
 					fire(Type.UNDO, command);
 				} while (command.isTransparent() && !undoHistory.isEmpty());
+				return true;
 			}
+			return false;
 		}
 
 		/**
 		 * Redo last command, if any
 		 */
-		public void redo() {
+		public boolean redo() {
 			if (!redoHistory.isEmpty()) {
 				Command command = redoHistory.pop();
 				undoHistory.add(command);
@@ -251,7 +253,9 @@ public class Commands {
 					doCommand(command);
 					fire(Type.REDO, command);
 				}
+				return true;
 			}
+			return false;
 		}
 	}
 
